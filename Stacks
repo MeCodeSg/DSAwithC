@@ -1,0 +1,134 @@
+# include <stdio.h>
+# include <stdlib.h>
+# include <conio.h>
+# include <string.h>
+# include <ctype.h>
+
+# define MX 100
+//int MX=100;
+char st[MX];
+int top=-1;
+
+void push(char st[], char num);
+char pop(char st[]);
+void parenthesisChecker(char exp[]);
+void display(char arr[]);
+void infixToPostfix(char infix[], char postfix[]);
+int getprior(char op);
+void reverse(char arr[], char temp[]);
+
+
+int main() {
+    char postfix[100]="";
+    char infix[100]="(A-(B/C+(D/E*F)/G)*H)";
+    char temp[100];
+    reverse(infix, temp);
+    infixToPostfix(temp, postfix);
+    reverse(postfix, temp);
+    display(temp);
+    
+    getch();
+    return 0;
+}
+void push(char st[], char num) {
+    if(top==MX-1) {
+        printf("Stack Overflow \n");
+    } else {
+        top++;
+        st[top]=num;
+    }
+}
+char pop(char st[]) {
+    char val=st[top];
+    top--;
+    return val;
+}
+void display(char arr[]) {
+    for(int i=0; arr[i]!='\0'; i++) {
+        printf("%c", arr[i]);
+    }
+}
+
+void parenthesisChecker(char exp[]) {
+    int i;
+    int flag=1;
+
+    for(i=0; i<exp[i]!='\0'; i++) {
+
+        if(exp[i]=='(') {
+            push(st, exp[i]);
+        }
+        if(exp[i]==')') {
+            if(top==-1) {
+                flag=0;
+            } else {
+                int temp=pop(st);
+            }
+        }
+    }
+    if(top>=0) {
+        flag=0;
+    }
+    
+    if(flag==1) {
+        printf("Valid");
+    } else {
+        printf("Invalid");
+    }
+}
+void infixToPostfix(char infix[], char postfix[]) {
+    int i;
+    int j=0;
+    //push(st, '(');
+    for(i=0; infix[i]!='\0'; i++) {
+        if(infix[i]=='(') {
+            push(st, '(');
+        } else if(infix[i]==')') {
+            while((top!=-1) && (st[top]!='(')) {
+                postfix[j]=pop(st);
+                j++;
+            }
+            if(top==-1) {
+                printf("Invalid Exp");
+                return;
+            }
+            int temp=pop(st);
+        } else if(isdigit(infix[i]) || (isalpha(infix[i]))) {
+            postfix[j]=infix[i];
+            j++;
+        } else if(infix[i]=='+' || infix[i]=='-' || infix[i]=='*' || infix[i]=='/' || infix[i]=='%') {
+            while((top!=-1) && (st[top]!='(') && (getprior(st[top])>getprior(infix[i]))) {
+                postfix[j]=pop(st);
+                j++;
+            }
+            push(st, infix[i]);
+        } else {
+            printf("INCORRECT");
+        }
+    }
+    postfix[j]='\0';
+}
+int getprior(char op) {
+    if(op=='*' || op=='/' || op=='%') {
+        return 1;
+    } else {
+        return 0;
+    }
+}
+void reverse(char arr[], char temp[]) {
+    int len=strlen(arr);
+    int i;
+    int j=len-1;
+    for(i=0; i<len; i++) {
+        char ch=arr[j];
+        if(arr[j]==')') {
+            temp[i]='(';
+        } else if(arr[j]=='(') {
+            temp[i]=')';
+        } else {
+            temp[i]=arr[j];
+        }
+        j--;
+    }
+    temp[i]='\0';
+}
